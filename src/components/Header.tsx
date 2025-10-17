@@ -1,6 +1,6 @@
 import { Button } from "./ui/button"
 import { MessageCircle } from "lucide-react"
-import logo from "figma:asset/5ed064860b964ee72f1f40b6959bdd6441edd366.png"
+import logo from "../assets/5ed064860b964ee72f1f40b6959bdd6441edd366.png"
 
 export function Header() {
   return (
