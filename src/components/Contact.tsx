@@ -11,7 +11,7 @@ import {
   Clock,
   Send
 } from "lucide-react"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 const contactInfo = [
   {
@@ -42,10 +42,14 @@ const contactInfo = [
 
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [result, setResult] = useState<null | { ok: boolean; message: string }>(null)
 
-  function handleMailto(e: React.MouseEvent<HTMLAnchorElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!formRef.current) return
+    setSubmitting(true)
+    setResult(null)
     const form = formRef.current
     const firstName = (form.querySelector('#firstName') as HTMLInputElement)?.value || ''
     const lastName = (form.querySelector('#lastName') as HTMLInputElement)?.value || ''
@@ -53,11 +57,26 @@ export function Contact() {
     const company = (form.querySelector('#company') as HTMLInputElement)?.value || ''
     const service = (form.querySelector('#service') as HTMLSelectElement)?.value || ''
     const message = (form.querySelector('#message') as HTMLTextAreaElement)?.value || ''
-    const subject = encodeURIComponent(`Business Inquiry from ${firstName} ${lastName}`)
-    const body = encodeURIComponent(
-      `Name: ${firstName} ${lastName}\nEmail: ${email}\nCompany: ${company}\nService: ${service}\nMessage: ${message}`
-    )
-    window.location.href = `mailto:info@heraldbusiness.org?subject=${subject}&body=${body}`
+
+    try {
+      const resp = await fetch('/api/send-email.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, company, service, message })
+      })
+      const data = await resp.json().catch(() => null)
+      if (resp.ok && data?.success) {
+        setResult({ ok: true, message: 'Your message has been sent. We will get back to you shortly.' })
+        form.reset()
+      } else {
+        const errMsg = (data && data.error) ? data.error : `Failed to send. Status ${resp.status}`
+        setResult({ ok: false, message: errMsg })
+      }
+    } catch (err) {
+      setResult({ ok: false, message: 'Network error. Please try again later.' })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -110,7 +129,7 @@ export function Contact() {
                 <CardTitle className="text-xl">Send Us a Message</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-6" ref={formRef}>
+                <form className="space-y-6" ref={formRef} onSubmit={handleSubmit}>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
@@ -155,12 +174,17 @@ export function Contact() {
                     />
                   </div>
                   
-                  <Button asChild size="lg" className="w-full md:w-auto">
-                    <a href="mailto:info@heraldbusiness.org" onClick={handleMailto}>
+                  <div className="flex flex-col gap-3">
+                    <Button type="submit" disabled={submitting} size="lg" className="w-full md:w-auto">
                       <Send className="w-4 h-4 mr-2" />
-                      Send Message
-                    </a>
-                  </Button>
+                      {submitting ? 'Sending…' : 'Send Message'}
+                    </Button>
+                    {result && (
+                      <p className={result.ok ? 'text-green-600' : 'text-red-600'}>
+                        {result.message}
+                      </p>
+                    )}
+                  </div>
                 </form>
               </CardContent>
             </Card>
