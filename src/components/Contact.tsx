@@ -11,7 +11,7 @@ import {
   Clock,
   Send
 } from "lucide-react"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
 const contactInfo = [
   {
@@ -42,14 +42,12 @@ const contactInfo = [
 
 export function Contact() {
   const formRef = useRef<HTMLFormElement>(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [result, setResult] = useState<null | { ok: boolean; message: string }>(null)
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleMailto(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault()
+    
     if (!formRef.current) return
-    setSubmitting(true)
-    setResult(null)
+    
     const form = formRef.current
     const firstName = (form.querySelector('#firstName') as HTMLInputElement)?.value || ''
     const lastName = (form.querySelector('#lastName') as HTMLInputElement)?.value || ''
@@ -58,25 +56,17 @@ export function Contact() {
     const service = (form.querySelector('#service') as HTMLSelectElement)?.value || ''
     const message = (form.querySelector('#message') as HTMLTextAreaElement)?.value || ''
 
-    try {
-      const resp = await fetch('/api/send-email.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName, lastName, email, company, service, message })
-      })
-      const data = await resp.json().catch(() => null)
-      if (resp.ok && data?.success) {
-        setResult({ ok: true, message: 'Your message has been sent. We will get back to you shortly.' })
-        form.reset()
-      } else {
-        const errMsg = (data && data.error) ? data.error : `Failed to send. Status ${resp.status}`
-        setResult({ ok: false, message: errMsg })
-      }
-    } catch (err) {
-      setResult({ ok: false, message: 'Network error. Please try again later.' })
-    } finally {
-      setSubmitting(false)
-    }
+    const subject = `Contact Form - ${service || 'General Inquiry'}`
+    const body = `Name: ${firstName} ${lastName}
+Email: ${email}
+Company: ${company}
+Service: ${service}
+
+Message:
+${message}`
+
+    const mailtoUrl = `mailto:info@heraldbusiness.org?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.location.href = mailtoUrl
   }
 
   return (
@@ -129,7 +119,7 @@ export function Contact() {
                 <CardTitle className="text-xl">Send Us a Message</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-6" ref={formRef} onSubmit={handleSubmit}>
+                <form className="space-y-6" ref={formRef}>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name</Label>
@@ -175,15 +165,12 @@ export function Contact() {
                   </div>
                   
                   <div className="flex flex-col gap-3">
-                    <Button type="submit" disabled={submitting} size="lg" className="w-full md:w-auto">
-                      <Send className="w-4 h-4 mr-2" />
-                      {submitting ? 'Sending…' : 'Send Message'}
+                    <Button type="button" size="lg" className="w-full md:w-auto" asChild>
+                      <a href="#" onClick={handleMailto}>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Message
+                      </a>
                     </Button>
-                    {result && (
-                      <p className={result.ok ? 'text-green-600' : 'text-red-600'}>
-                        {result.message}
-                      </p>
-                    )}
                   </div>
                 </form>
               </CardContent>
