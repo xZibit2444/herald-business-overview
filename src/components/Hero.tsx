@@ -1,5 +1,5 @@
 import { Button } from "./ui/button"
-import officeImage from "figma:asset/1b4ba5f1f3d9aab2e17854568d56ef1b99bea554.png"
+import officeImage from "../assets/1b4ba5f1f3d9aab2e17854568d56ef1b99bea554.png"
 
 export function Hero() {
   return (
