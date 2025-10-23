@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Create Visible Favicon</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        canvas { border: 2px solid #ddd; margin: 10px; background: white; }
+        .preview { display: flex; align-items: center; gap: 20px; margin: 20px 0; }
+        .preview-large { transform: scale(4); transform-origin: left center; margin-left: 60px; }
+        button { padding: 12px 24px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        .controls { background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        h1 { color: #333; margin-bottom: 10px; }
+        h3 { color: #555; margin-top: 30px; }
+        .info { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create High-Visibility Favicon</h1>
+        <div class="info">
+            <strong>Problem:</strong> Complex logos don't work well as favicons because they become unreadable at 16x16 pixels.
+            <br><strong>Solution:</strong> Create a simplified, high-contrast version with just the "H" letter.
+        </div>
+        
+        <div class="controls">
+            <h3>Design Options:</h3>
+            <button onclick="createSimpleH()">Simple "H" on Blue Background</button>
+            <button onclick="createCircleH()">White "H" in Blue Circle</button>
+            <button onclick="createSquareH()">Blue "H" in White Square</button>
+            <button onclick="createGradientH()">Gradient Background with "H"</button>
+        </div>
+        
+        <div class="preview">
+            <div>
+                <h3>32x32 Favicon:</h3>
+                <canvas id="favicon32" width="32" height="32"></canvas>
+                <button onclick="downloadFavicon(32)">Download 32x32</button>
+            </div>
+            <div>
+                <h3>16x16 Favicon:</h3>
+                <canvas id="favicon16" width="16" height="16"></canvas>
+                <button onclick="downloadFavicon(16)">Download 16x16</button>
+            </div>
+            <div>
+                <h3>Large Preview:</h3>
+                <canvas id="faviconPreview" width="32" height="32" class="preview-large"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createSimpleH() {
+            drawFavicon('simple');
+        }
+        
+        function createCircleH() {
+            drawFavicon('circle');
+        }
+        
+        function createSquareH() {
+            drawFavicon('square');
+        }
+        
+        function createGradientH() {
+            drawFavicon('gradient');
+        }
+        
+        function drawFavicon(style) {
+            // Draw 32x32 version
+            drawOnCanvas('favicon32', 32, style);
+            drawOnCanvas('faviconPreview', 32, style);
+            
+            // Draw 16x16 version
+            drawOnCanvas('favicon16', 16, style);
+        }
+        
+        function drawOnCanvas(canvasId, size, style) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            if (style === 'simple') {
+                // Blue background
+                ctx.fillStyle = '#1e40af';
+                ctx.fillRect(0, 0, size, size);
+                
+                // White H
+                ctx.fillStyle = 'white';
+                const strokeWidth = Math.max(2, size / 16);
+                const hWidth = size * 0.6;
+                const hHeight = size * 0.7;
+                const x = (size - hWidth) / 2;
+                const y = (size - hHeight) / 2;
+                
+                // Left vertical bar
+                ctx.fillRect(x, y, strokeWidth * 2, hHeight);
+                // Right vertical bar
+                ctx.fillRect(x + hWidth - strokeWidth * 2, y, strokeWidth * 2, hHeight);
+                // Horizontal bar
+                ctx.fillRect(x, y + hHeight/2 - strokeWidth, hWidth, strokeWidth * 2);
+                
+            } else if (style === 'circle') {
+                // Blue circle
+                ctx.fillStyle = '#1e40af';
+                ctx.beginPath();
+                ctx.arc(size/2, size/2, size/2, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // White H
+                ctx.fillStyle = 'white';
+                const strokeWidth = Math.max(1, size / 20);
+                const hWidth = size * 0.4;
+                const hHeight = size * 0.5;
+                const x = (size - hWidth) / 2;
+                const y = (size - hHeight) / 2;
+                
+                ctx.fillRect(x, y, strokeWidth * 2, hHeight);
+                ctx.fillRect(x + hWidth - strokeWidth * 2, y, strokeWidth * 2, hHeight);
+                ctx.fillRect(x, y + hHeight/2 - strokeWidth, hWidth, strokeWidth * 2);
+                
+            } else if (style === 'square') {
+                // White background with blue border
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = '#1e40af';
+                ctx.fillRect(0, 0, size, 2);
+                ctx.fillRect(0, 0, 2, size);
+                ctx.fillRect(size-2, 0, 2, size);
+                ctx.fillRect(0, size-2, size, 2);
+                
+                // Blue H
+                const strokeWidth = Math.max(2, size / 16);
+                const hWidth = size * 0.6;
+                const hHeight = size * 0.7;
+                const x = (size - hWidth) / 2;
+                const y = (size - hHeight) / 2;
+                
+                ctx.fillRect(x, y, strokeWidth * 2, hHeight);
+                ctx.fillRect(x + hWidth - strokeWidth * 2, y, strokeWidth * 2, hHeight);
+                ctx.fillRect(x, y + hHeight/2 - strokeWidth, hWidth, strokeWidth * 2);
+                
+            } else if (style === 'gradient') {
+                // Gradient background
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, '#1e40af');
+                gradient.addColorStop(1, '#3b82f6');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, size, size);
+                
+                // White H with shadow
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                const strokeWidth = Math.max(2, size / 16);
+                const hWidth = size * 0.6;
+                const hHeight = size * 0.7;
+                const x = (size - hWidth) / 2;
+                const y = (size - hHeight) / 2;
+                
+                // Shadow offset
+                ctx.fillRect(x+1, y+1, strokeWidth * 2, hHeight);
+                ctx.fillRect(x + hWidth - strokeWidth * 2 + 1, y+1, strokeWidth * 2, hHeight);
+                ctx.fillRect(x+1, y + hHeight/2 - strokeWidth + 1, hWidth, strokeWidth * 2);
+                
+                // White H
+                ctx.fillStyle = 'white';
+                ctx.fillRect(x, y, strokeWidth * 2, hHeight);
+                ctx.fillRect(x + hWidth - strokeWidth * 2, y, strokeWidth * 2, hHeight);
+                ctx.fillRect(x, y + hHeight/2 - strokeWidth, hWidth, strokeWidth * 2);
+            }
+        }
+        
+        function downloadFavicon(size) {
+            const canvas = document.getElementById('favicon' + size);
+            const link = document.createElement('a');
+            link.download = `favicon-${size}x${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Initialize with simple design
+        window.onload = function() {
+            createSimpleH();
+        };
+    </script>
+</body>
+</html>

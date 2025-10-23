@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Favicon Generator</title>
+    <style>
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .output { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Favicon Generator</h1>
+    <canvas id="canvas" width="32" height="32"></canvas>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <div class="output">
+        <button onclick="downloadFavicon()">Download 32x32 PNG</button>
+        <button onclick="downloadFavicon16()">Download 16x16 PNG</button>
+    </div>
+
+    <script>
+        function drawFavicon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const scale = size / 32;
+            
+            // Clear canvas
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Blue folder shape
+            ctx.fillStyle = '#1e3a8a';
+            ctx.beginPath();
+            ctx.moveTo(4 * scale, 4 * scale);
+            ctx.lineTo(24 * scale, 2 * scale);
+            ctx.lineTo(28 * scale, 2 * scale);
+            ctx.lineTo(26 * scale, 18 * scale);
+            ctx.lineTo(6 * scale, 20 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // White document area
+            ctx.fillStyle = 'white';
+            ctx.fillRect(8 * scale, 8 * scale, 16 * scale, 12 * scale);
+            
+            // "H" letter
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(10 * scale, 10 * scale, 2 * scale, 8 * scale);
+            ctx.fillRect(16 * scale, 10 * scale, 2 * scale, 8 * scale);
+            ctx.fillRect(10 * scale, 13 * scale, 8 * scale, 2 * scale);
+            
+            // Orange accent
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(12 * scale, 22 * scale, 8 * scale, 6 * scale);
+        }
+        
+        // Draw on both canvases
+        drawFavicon(document.getElementById('canvas'), 32);
+        drawFavicon(document.getElementById('canvas16'), 16);
+        
+        function downloadFavicon() {
+            const canvas = document.getElementById('canvas');
+            const link = document.createElement('a');
+            link.download = 'favicon-32x32.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function downloadFavicon16() {
+            const canvas = document.getElementById('canvas16');
+            const link = document.createElement('a');
+            link.download = 'favicon-16x16.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>

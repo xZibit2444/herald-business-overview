@@ -1,5 +1,5 @@
 import { CheckCircle } from "lucide-react"
-import signageImage from "../assets/595571cf0be36af888126a6363a0c7f8c80195a8.png"
+import signageImage from "../assets/herald-signage-new.jpg"
 
 const benefits = [
   "Focus on your core business while we handle operations",

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Favicon Converter</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .controls { margin: 20px 0; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Favicon Converter</h1>
+    <p>This tool will convert your image to proper favicon sizes</p>
+    
+    <div class="controls">
+        <input type="file" id="imageInput" accept="image/*">
+        <button onclick="convertToFavicon()">Convert to Favicon</button>
+    </div>
+    
+    <div>
+        <h3>32x32 Favicon Preview:</h3>
+        <canvas id="favicon32" width="32" height="32"></canvas>
+        <button onclick="downloadFavicon32()">Download 32x32 PNG</button>
+    </div>
+    
+    <div>
+        <h3>16x16 Favicon Preview:</h3>
+        <canvas id="favicon16" width="16" height="16"></canvas>
+        <button onclick="downloadFavicon16()">Download 16x16 PNG</button>
+    </div>
+
+    <script>
+        let originalImage = null;
+        
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        originalImage = img;
+                        convertToFavicon();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function convertToFavicon() {
+            if (!originalImage) return;
+            
+            // Convert to 32x32
+            const canvas32 = document.getElementById('favicon32');
+            const ctx32 = canvas32.getContext('2d');
+            ctx32.clearRect(0, 0, 32, 32);
+            ctx32.imageSmoothingEnabled = true;
+            ctx32.imageSmoothingQuality = 'high';
+            ctx32.drawImage(originalImage, 0, 0, 32, 32);
+            
+            // Convert to 16x16
+            const canvas16 = document.getElementById('favicon16');
+            const ctx16 = canvas16.getContext('2d');
+            ctx16.clearRect(0, 0, 16, 16);
+            ctx16.imageSmoothingEnabled = true;
+            ctx16.imageSmoothingQuality = 'high';
+            ctx16.drawImage(originalImage, 0, 0, 16, 16);
+        }
+        
+        function downloadFavicon32() {
+            const canvas = document.getElementById('favicon32');
+            const link = document.createElement('a');
+            link.download = 'favicon-32x32.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadFavicon16() {
+            const canvas = document.getElementById('favicon16');
+            const link = document.createElement('a');
+            link.download = 'favicon-16x16.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Auto-load the image if it exists
+        window.onload = function() {
+            const img = new Image();
+            img.onload = function() {
+                originalImage = img;
+                convertToFavicon();
+            };
+            img.onerror = function() {
+                console.log('No favicon-original.png found, use file input instead');
+            };
+            img.src = './favicon-original.png';
+        };
+    </script>
+</body>
+</html>
